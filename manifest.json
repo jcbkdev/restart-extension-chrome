@@ -1,0 +1,13 @@
+{
+  "name": "Restart",
+  "description": "description will go here",
+  "version": "1.0",
+  "manifest_version": 3,
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "permissions": ["tabs", "webNavigation"],
+  "background": {
+    "service_worker": "scripts/service_worker.js"
+  }
+}
