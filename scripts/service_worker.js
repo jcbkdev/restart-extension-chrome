@@ -36,7 +36,7 @@ function checkAndRedirect(details) {
   if (!url) return;
 
   isUrlBlocked(url).then((isBlocked) => {
-    if (isBlocked) chrome.tabs.update(tabId, { url: "https://google.com/" });
+    if (isBlocked) chrome.tabs.update(tabId, { url: "blocked.html" });
   });
 }
 
