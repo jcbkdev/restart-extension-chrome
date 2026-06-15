@@ -1,9 +1,32 @@
 import { BlockList } from "./block_list.js";
+import { BlockShorts } from "./block_shorts.js";
 import { isUrl } from "./helpers.js";
 
 function removeAllChildren(element) {
   while (element.firstChild) {
     element.removeChild(element.firstChild);
+  }
+}
+
+async function loadShortsInputValue() {
+  const inputElement = document.getElementById("shortsInput");
+  const blockShortsInstance = await BlockShorts.getInstance();
+  const blockShortsValue = await blockShortsInstance.getValue();
+
+  if (inputElement) {
+    inputElement.checked = blockShortsValue;
+  }
+}
+
+async function handleShortsInput(e) {
+  const isChecked = e.target.checked;
+
+  const blockShortsInstance = await BlockShorts.getInstance();
+  blockShortsInstance.setValue(isChecked);
+  if (isChecked) {
+    await blockShortsInstance.registerScript();
+  } else {
+    await blockShortsInstance.unregisterScript();
   }
 }
 
@@ -47,6 +70,10 @@ async function handleFormSubmit(e) {
 }
 
 async function initalize() {
+  const shortsInput = document.getElementById("shortsInput");
+  if (shortsInput) shortsInput.addEventListener("click", handleShortsInput);
+  await loadShortsInputValue();
+
   const formElement = document.getElementById("addForm");
   if (formElement) formElement.addEventListener("submit", handleFormSubmit);
   await loadList();

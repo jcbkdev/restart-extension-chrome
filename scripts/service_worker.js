@@ -1,12 +1,18 @@
 import { BlockList } from "./block_list.js";
+import { BlockShorts } from "./block_shorts.js";
 
 async function isUrlBlocked(url) {
   const blockListInstance = await BlockList.getInstance();
   const blockList = await blockListInstance.getUrls();
 
+  const blockShortsInstance = await BlockShorts.getInstance();
+  const isShortsBlocked = await blockShortsInstance.getValue();
+
+  if (isShortsBlocked) blockList.push("*://*.youtube.com/shorts");
+
   try {
     const currentUrl = new URL(url);
-    const fullPath = currentUrl.hostname + currentUrl.pathname;
+    const fullPath = currentUrl.origin + currentUrl.pathname;
 
     const isBlocked = blockList.some((blockedPattern) => {
       const regexPattern = blockedPattern
@@ -34,5 +40,25 @@ function checkAndRedirect(details) {
   });
 }
 
-chrome.webNavigation.onCompleted.addListener(checkAndRedirect);
-chrome.webNavigation.onHistoryStateUpdated.addListener(checkAndRedirect);
+async function initBlockShorts() {
+  const blockShortsInstance = await BlockShorts.getInstance();
+  const isBlocked = await blockShortsInstance.getValue();
+  const hasRegisteredScript = await blockShortsInstance.hasRegisteredScript();
+
+  if (isBlocked === undefined) return;
+
+  if (isBlocked) {
+    await blockShortsInstance.registerScript();
+  } else {
+    await blockShortsInstance.unregisterScript();
+  }
+}
+
+function initialize() {
+  initBlockShorts();
+
+  chrome.webNavigation.onCompleted.addListener(checkAndRedirect);
+  chrome.webNavigation.onHistoryStateUpdated.addListener(checkAndRedirect);
+}
+
+initialize();

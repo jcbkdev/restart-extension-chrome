@@ -1,0 +1,17 @@
+a#endpoint[title="Shorts"] {
+  display: none !important;
+}
+
+div#content:has(> ytd-rich-shelf-renderer[is-shorts]) {
+  display: none !important;
+}
+
+grid-shelf-view-model:has(ytm-shorts-lockup-view-model) {
+  display: none !important;
+}
+
+ytd-video-renderer:has(
+  ytd-thumbnail-overlay-time-status-renderer[overlay-style="SHORTS"]
+) {
+  display: none;
+}

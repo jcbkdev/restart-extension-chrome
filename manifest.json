@@ -6,7 +6,8 @@
   "action": {
     "default_popup": "popup.html"
   },
-  "permissions": ["tabs", "webNavigation", "storage"],
+  "permissions": ["tabs", "webNavigation", "storage", "scripting"],
+  "host_permissions": ["*://*.youtube.com/*"],
   "background": {
     "service_worker": "scripts/service_worker.js",
     "type": "module"
