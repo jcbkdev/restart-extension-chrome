@@ -1,4 +1,5 @@
-import { BlockList } from "./block_list.js";
+import { BlockList } from "./block_list/block_list.js";
+import { BlockListRepository } from "./block_list/block_list_repository.js";
 import { BlockShorts } from "./block_shorts.js";
 import { isUrl } from "./helpers.js";
 
@@ -32,18 +33,20 @@ async function handleShortsInput(e) {
 
 async function loadList() {
   const listElement = document.getElementById("list");
-  const blockListInstance = await BlockList.getInstance();
-  const blockList = await blockListInstance.getUrls();
+  const repoUserBlockList = await BlockListRepository.getBlockList("_user");
+
+  if (!repoUserBlockList) return;
 
   removeAllChildren(listElement);
 
-  blockList.forEach((url, index) => {
+  repoUserBlockList.getUrls().forEach((url, index) => {
     const urlElement = document.createElement("ul");
     const removeButton = document.createElement("button");
     removeButton.innerText = "remove";
     removeButton.addEventListener("click", async () => {
-      await blockListInstance.removeAtIndex(index);
-      loadList();
+      repoUserBlockList.removeAtIndex(index);
+      await BlockListRepository.saveBlockList(repoUserBlockList);
+      await loadList();
     });
     urlElement.innerText = url;
     urlElement.appendChild(removeButton);
@@ -61,8 +64,12 @@ async function handleFormSubmit(e) {
 
   if (!isUrl(url)) return;
 
-  const blockListInstance = await BlockList.getInstance();
-  const blockList = await blockListInstance.addUrl(url);
+  const repoUserBlockList = await BlockListRepository.getBlockList("_user");
+
+  if (!repoUserBlockList) return;
+
+  await repoUserBlockList.addUrl(url);
+  await BlockListRepository.saveBlockList(repoUserBlockList);
 
   formElement.reset();
 

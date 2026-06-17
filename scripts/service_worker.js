@@ -1,20 +1,23 @@
-import { BlockList } from "./block_list.js";
+import { BlockList } from "./block_list/block_list.js";
+import { BlockListRepository } from "./block_list/block_list_repository.js";
 import { BlockShorts } from "./block_shorts.js";
 
 async function isUrlBlocked(url) {
-  const blockListInstance = await BlockList.getInstance();
-  const blockList = await blockListInstance.getUrls();
+  const repoBlockLists = await BlockListRepository.getAllLists();
+  const allBlockedUrls = repoBlockLists.flatMap((blockList) =>
+    blockList.getUrls(),
+  );
 
   const blockShortsInstance = await BlockShorts.getInstance();
   const isShortsBlocked = await blockShortsInstance.getValue();
 
-  if (isShortsBlocked) blockList.push("*://*.youtube.com/shorts");
+  if (isShortsBlocked) allBlockedUrls.push("*://*.youtube.com/shorts");
 
   try {
     const currentUrl = new URL(url);
     const fullPath = currentUrl.origin + currentUrl.pathname;
 
-    const isBlocked = blockList.some((blockedPattern) => {
+    const isBlocked = allBlockedUrls.some((blockedPattern) => {
       const regexPattern = blockedPattern
         .replace(/\./g, "\\.")
         .replace(/\//g, "\\/")
@@ -26,14 +29,15 @@ async function isUrlBlocked(url) {
 
     return isBlocked;
   } catch (e) {
-    console.error("Invalid URL:", url, e);
+    console.error("[isUrlBlocked] Invalid URL:", url, e);
     return false;
   }
 }
 
 function checkAndRedirect(details) {
-  const { url, tabId } = details;
+  const { url, tabId, documentLifecycle } = details;
   if (!url) return;
+  if (documentLifecycle === "prerender") return;
 
   isUrlBlocked(url).then((isBlocked) => {
     if (isBlocked) chrome.tabs.update(tabId, { url: "blocked.html" });
@@ -54,7 +58,16 @@ async function initBlockShorts() {
   }
 }
 
+async function initBlockList() {
+  const repoUserBlockList = await BlockListRepository.getBlockList("_user");
+  if (!repoUserBlockList) {
+    const userBlockList = new BlockList("_user");
+    await BlockListRepository.saveBlockList(userBlockList);
+  }
+}
+
 function initialize() {
+  initBlockList();
   initBlockShorts();
 
   chrome.webNavigation.onCompleted.addListener(checkAndRedirect);
