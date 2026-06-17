@@ -2,6 +2,7 @@ import { BlockList } from "./block_list/block_list.js";
 import { BlockListRepository } from "./block_list/block_list_repository.js";
 import { BlockShorts } from "./block_shorts.js";
 import { isUrl } from "./helpers.js";
+import { PresetRepository } from "./preset/preset_repository.js";
 
 function removeAllChildren(element) {
   while (element.firstChild) {
@@ -55,6 +56,47 @@ async function loadList() {
   });
 }
 
+async function handlePresetInput(e, preset) {
+  if (!PresetRepository.isValidPreset(preset))
+    throw new Error(
+      "[handlePresetInput] argument preset is not a valid Preset",
+    );
+  const isChecked = e.target.checked;
+
+  preset.setStatus(isChecked);
+  await PresetRepository.savePreset(preset);
+}
+
+async function loadPresetList() {
+  const listElement = document.getElementById("presetList");
+  const repoPresetList = await PresetRepository.getAllPresets();
+
+  if (!repoPresetList) return;
+
+  removeAllChildren(listElement);
+
+  repoPresetList.forEach((preset) => {
+    const presetId = "preset-" + preset.getName();
+    const wrapperElement = document.createElement("li");
+    const labelElement = document.createElement("label");
+    labelElement.setAttribute("for", presetId);
+    labelElement.innerText = `Preset: ${preset.getName()}`;
+    const checkboxElement = document.createElement("input");
+    checkboxElement.type = "checkbox";
+    checkboxElement.id = presetId;
+    checkboxElement.checked = preset.getStatus();
+    checkboxElement.addEventListener("change", async (e) => {
+      await handlePresetInput(e, preset);
+      await loadPresetList();
+    });
+
+    wrapperElement.appendChild(labelElement);
+    wrapperElement.appendChild(checkboxElement);
+
+    listElement.appendChild(wrapperElement);
+  });
+}
+
 async function handleFormSubmit(e) {
   e.preventDefault();
 
@@ -84,6 +126,8 @@ async function initalize() {
   const formElement = document.getElementById("addForm");
   if (formElement) formElement.addEventListener("submit", handleFormSubmit);
   await loadList();
+
+  await loadPresetList();
 }
 
 window.addEventListener("DOMContentLoaded", initalize);

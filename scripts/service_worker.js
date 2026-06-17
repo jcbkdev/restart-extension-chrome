@@ -1,6 +1,8 @@
 import { BlockList } from "./block_list/block_list.js";
 import { BlockListRepository } from "./block_list/block_list_repository.js";
 import { BlockShorts } from "./block_shorts.js";
+import { defaultPresets } from "./preset/default_presets.js";
+import { PresetRepository } from "./preset/preset_repository.js";
 
 async function isUrlBlocked(url) {
   const repoBlockLists = await BlockListRepository.getAllLists();
@@ -12,6 +14,9 @@ async function isUrlBlocked(url) {
   const isShortsBlocked = await blockShortsInstance.getValue();
 
   if (isShortsBlocked) allBlockedUrls.push("*://*.youtube.com/shorts");
+
+  const activePresetUrls = await PresetRepository.getAllUrls(true);
+  allBlockedUrls.push(...activePresetUrls);
 
   try {
     const currentUrl = new URL(url);
@@ -66,9 +71,24 @@ async function initBlockList() {
   }
 }
 
+async function initDefaultPresets() {
+  const allDefaultPresets = Object.values(defaultPresets);
+
+  for (let i = 0; i < allDefaultPresets.length; i++) {
+    const preset = allDefaultPresets[i];
+    const isSaved =
+      (await PresetRepository.getPreset(preset.getName())) !== undefined;
+
+    if (!isSaved) {
+      await PresetRepository.savePreset(preset);
+    }
+  }
+}
+
 function initialize() {
   initBlockList();
   initBlockShorts();
+  initDefaultPresets();
 
   chrome.webNavigation.onCompleted.addListener(checkAndRedirect);
   chrome.webNavigation.onHistoryStateUpdated.addListener(checkAndRedirect);
