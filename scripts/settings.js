@@ -33,7 +33,7 @@ async function handleShortsInput(e) {
 }
 
 async function loadList() {
-  const listElement = document.getElementById("list");
+  const listElement = document.getElementById("urlList");
   const repoUserBlockList = await BlockListRepository.getBlockList("_user");
 
   if (!repoUserBlockList) return;
@@ -42,6 +42,10 @@ async function loadList() {
 
   repoUserBlockList.getUrls().forEach((url, index) => {
     const urlElement = document.createElement("li");
+
+    const textElement = document.createElement("span");
+    textElement.innerText = url;
+
     const removeButton = document.createElement("button");
     removeButton.innerText = "remove";
     removeButton.addEventListener("click", async () => {
@@ -49,7 +53,8 @@ async function loadList() {
       await BlockListRepository.saveBlockList(repoUserBlockList);
       await loadList();
     });
-    urlElement.innerText = url;
+
+    urlElement.appendChild(textElement);
     urlElement.appendChild(removeButton);
 
     listElement.appendChild(urlElement);
@@ -77,10 +82,14 @@ async function loadPresetList() {
 
   repoPresetList.forEach((preset) => {
     const presetId = "preset-" + preset.getName();
+
     const wrapperElement = document.createElement("li");
+    wrapperElement.classList.add("preset");
+
     const labelElement = document.createElement("label");
     labelElement.setAttribute("for", presetId);
-    labelElement.innerText = `Preset: ${preset.getName()}`;
+    labelElement.innerText = `${preset.getName()}`;
+
     const checkboxElement = document.createElement("input");
     checkboxElement.type = "checkbox";
     checkboxElement.id = presetId;

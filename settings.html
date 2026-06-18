@@ -1,17 +1,37 @@
 <html>
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Settings - Restart</title>
+    <link rel="stylesheet" href="styles/settings.css" />
     <script type="module" src="scripts/settings.js"></script>
   </head>
   <body>
-    <div>List</div>
-    <ul id="list"></ul>
-    <form id="addForm">
-      <label for="urlInput">Url to block</label>
-      <input id="urlInput" name="url" type="text" placeholder="url" />
-      <button type="submit">Add</button>
-    </form>
-    <input id="shortsInput" type="checkbox" />
-    <label for="shortsInput">Block youtube shorts</label>
-    <ul id="presetList"></ul>
+    <header>
+      <h1>Settings</h1>
+    </header>
+    <main>
+      <h2>Presets</h2>
+      <ul id="presetList"></ul>
+      <h2>Other</h2>
+      <div class="preset">
+        <label for="shortsInput">Block youtube shorts</label>
+        <input id="shortsInput" type="checkbox" />
+      </div>
+      <h2>Custom urls</h2>
+      <form id="addForm">
+        <label for="urlInput">Url to block</label>
+        <div class="url-input-wrapper">
+          <input
+            id="urlInput"
+            name="url"
+            type="text"
+            placeholder="example.com or *.example.com/*"
+          />
+          <button type="submit">Add</button>
+        </div>
+      </form>
+      <ul id="urlList"></ul>
+    </main>
   </body>
 </html>
