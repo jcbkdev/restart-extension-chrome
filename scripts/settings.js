@@ -41,7 +41,7 @@ async function loadList() {
   removeAllChildren(listElement);
 
   repoUserBlockList.getUrls().forEach((url, index) => {
-    const urlElement = document.createElement("ul");
+    const urlElement = document.createElement("li");
     const removeButton = document.createElement("button");
     removeButton.innerText = "remove";
     removeButton.addEventListener("click", async () => {
