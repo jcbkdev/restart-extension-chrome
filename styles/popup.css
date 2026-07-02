@@ -1,5 +1,25 @@
+@font-face {
+  font-family: "Montserrat";
+  src: url("../fonts/Montserrat-VariableFont_wght.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Montserrat";
+  src: url("../fonts/Montserrat-Italic-VariableFont_wght.ttf")
+    format("truetype");
+  font-style: italic;
+}
+
 body {
   width: 320px;
+  margin: 0;
+  padding: 0;
+  background-color: black;
+  color: white;
+}
+
+main {
+  padding: 16px;
 }
 
 #activePresets {
@@ -16,4 +36,51 @@ body {
   color: white;
   margin-right: 8px;
   margin-bottom: 8px;
+}
+
+#urlList {
+  list-style: none;
+  padding: 0;
+  background-color: #1c1e25;
+  border-radius: 8px;
+}
+
+#urlList li {
+  display: block;
+  padding: 8px 12px;
+  color: white;
+  font-size: 12px;
+  font-family: "Monaco", "Courier New", monospace;
+}
+
+#urlList li:not(:last-child) {
+  border-bottom: 1px solid #253143;
+}
+
+.btn {
+  background-color: #1a56db;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: 0.2s ease;
+}
+
+.btn:hover {
+  background-color: #1549ba;
+}
+
+a.btn {
+  text-decoration: none;
+}
+
+footer {
+  background: #1c1e25;
+  border-top: 1px solid #253143;
+  display: flex;
+  box-sizing: border-box;
+  padding: 16px;
 }
