@@ -90,7 +90,7 @@ function initialize() {
   initBlockShorts();
   initDefaultPresets();
 
-  chrome.webNavigation.onCompleted.addListener(checkAndRedirect);
+  chrome.webNavigation.onBeforeNavigate.addListener(checkAndRedirect);
   chrome.webNavigation.onHistoryStateUpdated.addListener(checkAndRedirect);
 }
 
