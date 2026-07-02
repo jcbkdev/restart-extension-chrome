@@ -4,6 +4,22 @@ import { BlockShorts } from "./block_shorts.js";
 import { defaultPresets } from "./preset/default_presets.js";
 import { PresetRepository } from "./preset/preset_repository.js";
 
+function isUserNavigation(details) {
+  if (typeof details !== "object") {
+    throw new Error(
+      "[isUserNavigation] argument details must be type of object",
+    );
+  }
+
+  if (!Object.hasOwn(details, "frameId")) {
+    throw new Error(
+      "[isUserNavigation] argument details does not have frameId property",
+    );
+  }
+
+  return details.frameId === 0;
+}
+
 async function isUrlBlocked(url) {
   const repoBlockLists = await BlockListRepository.getAllLists();
   const allBlockedUrls = repoBlockLists.flatMap((blockList) =>
@@ -40,9 +56,15 @@ async function isUrlBlocked(url) {
 }
 
 function checkAndRedirect(details) {
-  const { url, tabId, documentLifecycle } = details;
+  const { url, tabId, documentLifecycle, frameId } = details;
   if (!url) return;
   if (documentLifecycle === "prerender") return;
+
+  try {
+    if (!isUserNavigation(details)) return;
+  } catch (e) {
+    console.error(e);
+  }
 
   isUrlBlocked(url).then((isBlocked) => {
     if (isBlocked) chrome.tabs.update(tabId, { url: "blocked.html" });
