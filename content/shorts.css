@@ -15,3 +15,7 @@ ytd-video-renderer:has(
 ) {
   display: none;
 }
+
+ytm-item-section-renderer:has(ytd-reel-shelf-renderer) {
+  display: none !important;
+}
