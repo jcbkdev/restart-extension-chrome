@@ -16,6 +16,6 @@ ytd-video-renderer:has(
   display: none;
 }
 
-ytm-item-section-renderer:has(ytd-reel-shelf-renderer) {
+ytd-reel-shelf-renderer:has(yt-horizontal-list-renderer) {
   display: none !important;
 }
