@@ -19,3 +19,7 @@ ytd-video-renderer:has(
 ytd-reel-shelf-renderer:has(yt-horizontal-list-renderer) {
   display: none !important;
 }
+
+yt-tab-shape[tab-title="Shorts"] {
+  display: none !important;
+}
